@@ -1,35 +1,28 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+// src/App.jsx
+import React from 'react';
+// YA NO importamos el Router aquí
+import { Routes, Route } from 'react-router-dom';
+
+// Importa los componentes principales y las páginas
+import Navbar from './components/Navbar.jsx';
+import Footer from './components/Footer.jsx';
+import HomePage from './pages/HomePage.jsx';
+import NewsPage from './pages/NewsPage.jsx';
+import SingleNewsPage from './pages/SingleNewsPage.jsx';
 
 function App() {
-  const [count, setCount] = useState(0)
-
+  // Simplemente retornamos el contenido, sin el <Router>
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div className="App">
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/noticias" element={<NewsPage />} />
+        <Route path="/noticias/:articleId" element={<SingleNewsPage />} />
+      </Routes>
+      <Footer />
+    </div>
+  );
 }
 
-export default App
+export default App;
