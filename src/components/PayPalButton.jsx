@@ -2,14 +2,10 @@
 import React from 'react';
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 
-// --- ¡MUY IMPORTANTE! ---
-// 1. Obtén tu Client ID desde tu PayPal Developer Dashboard.
-// 2. NUNCA subas esta clave directamente a GitHub. Guárdala en un archivo .env.local
-//    y léela con `import.meta.env.VITE_PAYPAL_CLIENT_ID`
-// Por ahora, para probar, la pondremos aquí.
+
 const CLIENT_ID = "AbeNVaWdv3WdmLOWFdI4XBRi44dqrxirnHrSvP9FUzT8B-c2IwxUgxT7ciqBdCTs7P-0Px0kREgM_T9q"; 
 
-const PayPalButton = ({ currency, amount }) => {
+const PayPalButton = ({ currency, amount, onSuccess }) => {
   if (!CLIENT_ID){
     return <div className="text-center text-red-500 font-bold p-4 bg-red-100 rounded-lg">Error: La clave de cliente de PayPal no está configurada.</div>;
   }
@@ -34,7 +30,9 @@ const PayPalButton = ({ currency, amount }) => {
         onApprove={async (data, actions) => {
           const order = await actions.order.capture();
           console.log("¡Pago exitoso!", order);
-          alert(`¡Gracias por tu donación de ${amount} ${currency}! Tu apoyo transforma vidas.`);
+         if (onSuccess) {
+            onSuccess();
+          }
           // Opcional: podrías llamar a una función para cerrar el modal aquí
         }}
         onError={(err) => {
