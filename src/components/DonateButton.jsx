@@ -1,41 +1,66 @@
-// src/sections/DonateSection.jsx
-import React, { useState } from 'react'; // 1. Importa useState
-import { motion } from 'framer-motion';
-import DonateButton from './DonateButton.jsx';
-import DonationModal from './DonationModal.jsx'; // 2. Importa el nuevo modal
+// src/components/DonateButton.jsx
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
-const DonateSection = () => {
-    // 3. Estado para controlar si el modal está abierto o cerrado
-    const [isModalOpen, setIsModalOpen] = useState(false);
+const DonateButton = () => {
+  const [modalOpen, setModalOpen] = useState(false);
 
-    const openModal = () => setIsModalOpen(true);
-    const closeModal = () => setIsModalOpen(false);
+  const openModal = () => setModalOpen(true);
+  const closeModal = () => setModalOpen(false);
 
-    return (
-        <>
-            <section id="donate" className="py-20 bg-foundation-blue">
-                <motion.div 
-                    className="container mx-auto px-6 text-center"
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, amount: 0.5 }}
-                    transition={{ duration: 0.6 }}
-                >
-                    <h2 className="text-3xl font-bold text-white mb-4">
-                        Tu Apoyo Transforma Vidas
-                    </h2>
-                    <p className="text-lg text-white/90 max-w-2xl mx-auto mb-8">
-                        Cada donación, sin importar el tamaño, nos acerca más a nuestro objetivo de brindar a los niños las herramientas que necesitan para un futuro brillante.
-                    </p>
-                    {/* 4. El botón ahora abre el modal */}
-                    <DonateButton onClick={openModal} />
-                </motion.div>
-            </section>
+  return (
+    <>
+      {/* --- El Botón --- */}
+      <button
+        onClick={openModal}
+        className="
+          px-6 py-3 rounded-full font-semibold text-white shadow-lg
+          bg-foundation-pink 
+          hover:bg-pink-500 hover:scale-105 
+          active:scale-95
+          transform transition-all duration-300 ease-in-out
+          focus:outline-none focus:ring-2 focus:ring-pink-400 focus:ring-opacity-75
+          animate-pulse hover:animate-none" // Efecto de pulso que se detiene al pasar el mouse
+      >
+        Donar ahora
+      </button>
 
-            {/* 5. El modal se renderiza aquí, pero solo es visible si isModalOpen es true */}
-            <DonationModal isOpen={isModalOpen} onClose={closeModal} />
-        </>
-    );
+      {/* --- El Modal (Ventana Emergente) --- */}
+      <AnimatePresence>
+        {modalOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={closeModal} // Cierra el modal al hacer clic en el fondo
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50"
+          >
+            <motion.div
+              initial={{ scale: 0.9, y: -50, opacity: 0 }}
+              animate={{ scale: 1, y: 0, opacity: 1 }}
+              exit={{ scale: 0.9, y: 50, opacity: 0 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+              onClick={(e) => e.stopPropagation()} // Evita que el clic dentro del modal lo cierre
+              className="bg-white rounded-lg shadow-2xl p-8 max-w-sm text-center"
+            >
+              <h3 className="text-2xl font-bold text-dark-text mb-4">
+                ¡Próximamente!
+              </h3>
+              <p className="text-light-text mb-6">
+                Estamos trabajando para activar nuestro portal de donaciones. ¡Gracias por tu paciencia y tu deseo de ayudar!
+              </p>
+              <button
+                onClick={closeModal}
+                className="px-5 py-2 rounded-full font-semibold text-white bg-foundation-blue hover:bg-blue-500 transition-colors"
+              >
+                Entendido
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
+  );
 };
 
-export default DonateSection;
+export default DonateButton;
