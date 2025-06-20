@@ -7,10 +7,10 @@ import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 // 2. NUNCA subas esta clave directamente a GitHub. Guárdala en un archivo .env.local
 //    y léela con `import.meta.env.VITE_PAYPAL_CLIENT_ID`
 // Por ahora, para probar, la pondremos aquí.
-const CLIENT_ID = "ELYRBUkxvVC4d0tS6g7M1VfuooRDUmWa4H37mntfCsIy6--frKRuUsC_ENjlUuo5mAnHmu-GejAIFdyP"; 
+const CLIENT_ID = "AbeNVaWdv3WdmLOWFdI4XBRi44dqrxirnHrSvP9FUzT8B-c2IwxUgxT7ciqBdCTs7P-0Px0kREgM_T9q"; 
 
 const PayPalButton = ({ currency, amount }) => {
-  if (!CLIENT_ID || CLIENT_ID === "ELYRBUkxvVC4d0tS6g7M1VfuooRDUmWa4H37mntfCsIy6--frKRuUsC_ENjlUuo5mAnHmu-GejAIFdyP") {
+  if (!CLIENT_ID){
     return <div className="text-center text-red-500 font-bold p-4 bg-red-100 rounded-lg">Error: La clave de cliente de PayPal no está configurada.</div>;
   }
 
