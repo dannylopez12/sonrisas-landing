@@ -1,11 +1,12 @@
 // src/components/Footer.jsx
 import React from 'react';
-import { FaFacebook, FaInstagram, FaWhatsapp } from 'react-icons/fa';
+// 1. IMPORTAMOS EL ÍCONO DE TIKTOK
+import { FaFacebook, FaInstagram, FaWhatsapp, FaTiktok } from 'react-icons/fa';
 
 const Footer = () => {
   const year = new Date().getFullYear();
 
-  // URL para el chat de WhatsApp (no necesita el '+')
+  // URL para el chat de WhatsApp
   const whatsappUrl = `https://wa.me/593994450099`;
 
   return (
@@ -46,6 +47,16 @@ const Footer = () => {
             className="text-3xl hover:text-foundation-yellow transition-transform duration-300 hover:scale-125"
           >
             <FaWhatsapp />
+          </a>
+
+          {/* 2. AÑADIMOS EL ÍCONO Y ENLACE DE TIKTOK */}
+          <a 
+            href="https://www.tiktok.com/@fundacion.sonrisas_" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="text-3xl hover:text-foundation-yellow transition-transform duration-300 hover:scale-125"
+          >
+            <FaTiktok />
           </a>
         </div>
         
