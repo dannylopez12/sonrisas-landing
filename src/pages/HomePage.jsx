@@ -1,36 +1,27 @@
 // src/pages/HomePage.jsx
-import React, { useState } from 'react';
+import React from 'react';
 
-// Importa las secciones
+// Importa todas las secciones que componen la página de inicio
 import Hero from '../sections/Hero.jsx';
 import AboutUs from '../sections/AboutUs.jsx';
 import Club from '../sections/Club.jsx';
 import NewsSection from '../sections/NewsSection.jsx';
 import Gallery from '../sections/Gallery.jsx';
-// Importamos la sección de donación y el modal
 import DonateSection from '../sections/DonateSection.jsx';
-import DonationModal from '../components/DonationModal.jsx';
 
-const HomePage = () => {
-  // Ahora React sabe qué es useState
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const openModal = () => setIsModalOpen(true);
-  const closeModal = () => setIsModalOpen(false);
-
+// 1. El componente ahora recibe la prop 'onDonateClick' desde App.jsx
+const HomePage = ({ onDonateClick }) => {
   return (
-    <>
-      <main>
-        <Hero />
-        <AboutUs />
-        <Club />
-        <NewsSection />
-        <Gallery />
-        <DonateSection onDonateClick={openModal} />
-      </main>
-
-      <DonationModal isOpen={isModalOpen} onClose={closeModal} />
-    </>
+    // Ya no necesitamos un fragmento vacío (<>), 'main' es suficiente.
+    <main>
+      <Hero />
+      <AboutUs />
+      <Club />
+      <NewsSection />
+      <Gallery />
+      {/* 2. Le pasamos la función que recibimos directamente a la sección de donación */}
+      <DonateSection onDonateClick={onDonateClick} />
+    </main>
   );
 };
 
