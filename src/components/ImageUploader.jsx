@@ -1,4 +1,4 @@
-// src/components/ImageUploader.jsx
+// src/components/ImageUploader.jsx (Versión Definitiva y Correcta)
 import React, { useState } from 'react';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { db } from '../firebase';
@@ -11,7 +11,6 @@ const ImageUploader = ({ albumId }) => {
   const storage = getStorage();
 
   const handleFileChange = (e) => {
-    // Convertimos el FileList en un Array para poder mapearlo
     const selectedFiles = Array.from(e.target.files);
     if (selectedFiles.length > 0) {
       setFiles(selectedFiles);
@@ -29,26 +28,37 @@ const ImageUploader = ({ albumId }) => {
     setError('');
 
     const uploadPromises = files.map(async (file) => {
-      // Creamos una referencia única para cada foto
-      const imageRef = ref(storage, `gallery/${albumId}/${Date.now()}_${file.name}`);
+      // 1. CREAMOS UN ID ÚNICO Y LIMPIO PARA LA FOTO
+      //    Quitamos caracteres especiales del nombre para evitar problemas.
+      const photoId = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.]/g, '')}`;
+      const imageRef = ref(storage, `gallery/${albumId}/${photoId}`);
+      
       // Subimos la foto
       await uploadBytes(imageRef, file);
-      // Obtenemos la URL de descarga de la foto subida
-      return getDownloadURL(imageRef);
+      
+      // Obtenemos la URL de descarga
+      const url = await getDownloadURL(imageRef);
+      
+      // 2. DEVOLVEMOS EL OBJETO CON EL FORMATO CORRECTO
+      return { id: photoId, url: url };
     });
 
     try {
-      // Esperamos a que todas las fotos se suban y obtengamos sus URLs
-      const imageUrls = await Promise.all(uploadPromises);
+      const newPhotosData = await Promise.all(uploadPromises);
       
-      // Actualizamos el documento del álbum en Firestore con las nuevas URLs
       const albumRef = doc(db, 'galleryAlbums', albumId);
+      // 3. AÑADIMOS LOS OBJETOS AL ARRAY 'photos' EN FIRESTORE
       await updateDoc(albumRef, {
-        images: arrayUnion(...imageUrls) // arrayUnion añade los nuevos elementos sin borrar los existentes
+        photos: arrayUnion(...newPhotosData)
       });
 
       alert('¡Fotos subidas con éxito!');
       setFiles([]); // Limpiamos la selección
+      
+      // Limpiamos el input de archivos
+      const fileInput = document.getElementById(`file-input-${albumId}`);
+      if (fileInput) fileInput.value = '';
+
     } catch (err) {
       console.error('Error al subir las fotos:', err);
       setError('Ocurrió un error al subir las fotos. Inténtalo de nuevo.');
@@ -62,10 +72,11 @@ const ImageUploader = ({ albumId }) => {
       <h3 className="text-lg font-semibold mb-2">Subir Fotos a este Álbum</h3>
       <div className="flex flex-col space-y-4">
         <input
+          id={`file-input-${albumId}`} // ID único para cada uploader
           type="file"
-          multiple // Permite seleccionar múltiples archivos
+          multiple
           onChange={handleFileChange}
-          className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-foundation-blue/10 file:text-foundation-blue hover:file:bg-foundation-blue/20"
+          className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-foundation-blue/10 file:text-foundation-blue hover:file:bg-foundation-blue/20 cursor-pointer"
         />
         {files.length > 0 && (
           <div>
