@@ -2,7 +2,7 @@
 import React, { useCallback, useEffect  } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import TextStyle from '@tiptap/extension-text-style';
+import { TextStyle } from '@tiptap/extension-text-style';
 import { FontSize } from '@tiptap/extension-font-size';
 import { 
   FaBold, FaItalic, FaStrikethrough, FaParagraph, 
