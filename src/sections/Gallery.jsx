@@ -1,105 +1,101 @@
 // src/sections/Gallery.jsx
-import React, { useRef } from 'react'; // 1. Importa useRef
-// ... tus otras importaciones de Swiper ...
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { db } from '../firebase';
+import { collection, query, onSnapshot } from 'firebase/firestore';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation, Pagination, Autoplay, EffectCoverflow } from 'swiper/modules';
+import { Autoplay, EffectCoverflow, Navigation } from 'swiper/modules';
+
+// Importa los estilos de Swiper
 import 'swiper/css';
 import 'swiper/css/navigation';
-import 'swiper/css/pagination';
 import 'swiper/css/effect-coverflow';
 
-// --- IMPORTA TUS IMÁGENES Y VIDEOS ---
-// Imágenes
-import img1 from '../assets/1.jpg';
-import img2 from '../assets/2.jpg';
-import img3 from '../assets/3.jpg';
-import img4 from '../assets/4.jpg';
-// Videos
-import video1 from '../assets/video1.mp4'; // Asegúrate de tenerlos en assets
-import video2 from '../assets/video2.mp4';
+// Función para barajar un array (Algoritmo Fisher-Yates)
+const shuffleArray = (array) => {
+  const newArray = [...array];
+  for (let i = newArray.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+  }
+  return newArray;
+};
 
-const Gallery = () => {
-  // 2. CREA UNA ESTRUCTURA DE DATOS PARA MEDIOS MIXTOS
-  const mediaItems = [
-    { type: 'image', src: img1 },
-    { type: 'video', src: video1 },
-    { type: 'image', src: img2 },
-    { type: 'video', src: video2 },
-    { type: 'image', src: img3 },
-    { type: 'image', src: img4 },
-  ];
+const GalleryPreview = () => {
+  const [randomImages, setRandomImages] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const swiperRef = useRef(null); // Ref para controlar el Swiper
+  useEffect(() => {
+    // 1. OBTENEMOS TODOS LOS ÁLBUMES
+    const q = query(collection(db, 'galleryAlbums'));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      // 2. RECOPILAMOS TODAS LAS IMÁGENES DE TODOS LOS ÁLBUMES EN UN SOLO LUGAR
+      // Guardamos tanto la URL de la imagen como el ID del álbum al que pertenece
+      const allImages = snapshot.docs.flatMap(doc => 
+        doc.data().images.map(imageUrl => ({
+          imageUrl,
+          albumId: doc.id,
+          albumTitle: doc.data().title
+        }))
+      );
 
-  const handleVideoPlay = () => {
-    // Detiene el autoplay del carrusel cuando un video se reproduce
-    if (swiperRef.current && swiperRef.current.swiper) {
-      swiperRef.current.swiper.autoplay.stop();
-    }
-  };
+      // 3. BARAJAMOS Y SELECCIONAMOS UNA MUESTRA
+      const shuffled = shuffleArray(allImages);
+      setRandomImages(shuffled.slice(0, 10)); // Mostramos hasta 10 imágenes aleatorias
+      setLoading(false);
+    });
 
-  const handleVideoPause = () => {
-    // Reanuda el autoplay cuando el video se pausa o termina
-    if (swiperRef.current && swiperRef.current.swiper) {
-      swiperRef.current.swiper.autoplay.start();
-    }
-  };
+    return () => unsubscribe();
+  }, []);
+
+  if (loading) {
+    return <div className="text-center py-10">Cargando galería...</div>;
+  }
 
   return (
-    <section id="gallery" className="py-20 bg-gray-100">
+    <section id="gallery" className="py-20 bg-gray-100 overflow-hidden">
       <div className="container mx-auto px-6 text-center">
         <h2 className="text-3xl font-bold text-gray-800 mb-4">Nuestros Momentos</h2>
         <p className="text-gray-600 max-w-2xl mx-auto mb-12">
-          Revive con nosotros la alegría y el progreso de nuestros niños.
+          Un carrusel de sonrisas y logros. Haz clic en una foto para ver el álbum completo.
         </p>
       </div>
+      
+      {/* 4. RENDERIZAMOS EL CARRUSEL CON LAS IMÁGENES ALEATORIAS */}
       <Swiper
-        ref={swiperRef} // 3. Asigna la referencia al Swiper
-        modules={[Navigation, Pagination, Autoplay, EffectCoverflow]}
         effect={'coverflow'}
         grabCursor={true}
         centeredSlides={true}
         loop={true}
         slidesPerView={'auto'}
         coverflowEffect={{
-          rotate: 50,
+          rotate: 30,
           stretch: 0,
           depth: 100,
           modifier: 1,
-          slideShadows: true,
+          slideShadows: false,
         }}
         autoplay={{
-          delay: 3500, // Aumentamos un poco el delay
+          delay: 3000,
           disableOnInteraction: false,
         }}
-        pagination={{ clickable: true }}
         navigation={true}
-        className="max-w-6xl mx-auto"
+        modules={[Autoplay, EffectCoverflow, Navigation]}
+        className="w-full"
       >
-        {mediaItems.map((item, index) => (
-          <SwiperSlide key={index} style={{ width: '300px', height: '400px' }}>
-            {/* 4. RENDERIZADO CONDICIONAL */}
-            {item.type === 'image' ? (
-              // Si es una imagen
+        {randomImages.map(({ imageUrl, albumId, albumTitle }, index) => (
+          <SwiperSlide key={`${albumId}-${index}`} style={{ width: '320px', height: '420px' }}>
+            {/* CADA SLIDE ES UN ENLACE AL ÁLBUM CORRESPONDIENTE */}
+            <Link to={`/galeria/${albumId}`} className="block w-full h-full group relative">
               <img 
-                src={item.src} 
-                alt={`Galería de la fundación ${index + 1}`} 
-                className="w-full h-full object-cover rounded-lg shadow-lg"
-                loading="lazy" // Carga la imagen de forma perezosa
+                src={imageUrl} 
+                alt={`Foto del álbum ${albumTitle}`} 
+                className="w-full h-full object-cover rounded-lg shadow-xl"
               />
-            ) : (
-              // Si es un video
-              <video
-                src={item.src}
-                className="w-full h-full object-cover rounded-lg shadow-lg"
-                controls // Muestra los controles de reproducción
-                muted // Esencial: los videos deben empezar sin sonido
-                onPlay={handleVideoPlay}
-                onPause={handleVideoPause}
-                onEnded={handleVideoPause} // También reanuda al terminar
-                loading="lazy" // Carga el video de forma perezosa
-              ></video>
-            )}
+              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center text-white p-4 rounded-lg">
+                <span className="font-bold text-center">Ver Álbum: <br/> {albumTitle}</span>
+              </div>
+            </Link>
           </SwiperSlide>
         ))}
       </Swiper>
@@ -107,4 +103,4 @@ const Gallery = () => {
   );
 };
 
-export default Gallery;
+export default GalleryPreview;

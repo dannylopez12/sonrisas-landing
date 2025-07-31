@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { IoClose } from 'react-icons/io5';
 import PayPalButton from './PayPalButton.jsx';
-import DonationSuccess from './DonationSuccess.jsx'; // Importamos el componente de éxito
+import DonationSuccess from './DonationSuccess.jsx';
 
 // --- Definiciones de Animación ---
 const backdropVariants = {
@@ -21,17 +21,26 @@ const modalVariants = {
 const DonationModal = ({ isOpen, onClose }) => {
   // --- ESTADOS ---
   const [amount, setAmount] = useState('10');
-  const [isSuccess, setIsSuccess] = useState(false); // Estado para controlar si mostramos la vista de éxito
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [donorName, setDonorName] = useState('');      // <-- NUEVO ESTADO para el nombre
+  const [message, setMessage] = useState('');        // <-- NUEVO ESTADO para el mensaje
+  const [isAnonymous, setIsAnonymous] = useState(false); // <-- NUEVO ESTADO para el anonimato
+  
   const predefinedAmounts = ['5', '10', '25', '50'];
 
   // --- HANDLERS (Manejadores de eventos) ---
   const handleSuccess = () => {
-    setIsSuccess(true); // Cambiamos a la vista de éxito
+    setIsSuccess(true);
   };
 
   const handleClose = () => {
-    setIsSuccess(false); // Reseteamos la vista de éxito para la próxima vez que se abra el modal
-    onClose(); // Llamamos a la función del padre para cerrar el modal
+    // Reseteamos todos los estados para la próxima vez que se abra el modal
+    setIsSuccess(false);
+    setDonorName('');
+    setMessage('');
+    setIsAnonymous(false);
+    setAmount('10');
+    onClose();
   };
 
   const handleAmountChange = (e) => {
@@ -39,10 +48,8 @@ const DonationModal = ({ isOpen, onClose }) => {
     setAmount(value);
   };
 
-  // Condición para mostrar los botones de PayPal
   const isValidAmount = !isNaN(parseFloat(amount)) && parseFloat(amount) > 0;
   
-  // No renderizamos nada si el modal no está abierto
   if (!isOpen) return null;
 
   return (
@@ -57,7 +64,7 @@ const DonationModal = ({ isOpen, onClose }) => {
           onClick={handleClose}
         >
           <motion.div
-            key={isSuccess ? 'success' : 'form'} // Clave para que AnimatePresence detecte el cambio de componente
+            key={isSuccess ? 'success' : 'form'}
             className="bg-white rounded-lg shadow-2xl p-8 max-w-lg w-full text-center relative max-h-[90vh] overflow-y-auto"
             variants={modalVariants}
             initial="hidden"
@@ -65,42 +72,66 @@ const DonationModal = ({ isOpen, onClose }) => {
             exit="exit"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* RENDERIZADO CONDICIONAL: Mostramos una vista u otra */}
             {isSuccess ? (
-              // --- VISTA DE ÉXITO ---
               <DonationSuccess onClose={handleClose} />
             ) : (
-              // --- VISTA DE FORMULARIO DE DONACIÓN ---
               <>
                 <button onClick={handleClose} className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 transition-colors z-10">
                   <IoClose size={28} />
                 </button>
                 <h2 className="text-2xl font-bold text-gray-800 mb-2">Haz tu Donación</h2>
-                <p className="text-gray-600 mb-6">Elige o ingresa un monto para donar.</p>
+                <p className="text-gray-600 mb-6">Tu apoyo hace la diferencia. ¡Gracias!</p>
+
+                {/* --- NUEVOS CAMPOS DE FORMULARIO --- */}
+                <div className="text-left space-y-4 mb-8">
+                  <div>
+                    <label htmlFor="donorName" className="block text-sm font-medium text-gray-700">Tu Nombre (opcional)</label>
+                    <input
+                      type="text"
+                      id="donorName"
+                      value={donorName}
+                      onChange={(e) => setDonorName(e.target.value)}
+                      disabled={isAnonymous}
+                      placeholder="Ej: Juan Pérez"
+                      className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-foundation-blue focus:ring-foundation-blue sm:text-sm ${isAnonymous ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                    />
+                  </div>
+                  <div className="flex items-center">
+                    <input
+                      id="anonymous"
+                      type="checkbox"
+                      checked={isAnonymous}
+                      onChange={(e) => setIsAnonymous(e.target.checked)}
+                      className="h-4 w-4 rounded border-gray-300 text-foundation-blue focus:ring-foundation-blue"
+                    />
+                    <label htmlFor="anonymous" className="ml-2 block text-sm text-gray-900">Quiero donar de forma anónima</label>
+                  </div>
+                  <div>
+                    <label htmlFor="message" className="block text-sm font-medium text-gray-700">Mensaje de Apoyo (opcional)</label>
+                    <textarea
+                      id="message"
+                      rows={3}
+                      value={message}
+                      onChange={(e) => setMessage(e.target.value)}
+                      placeholder="¡Mucha fuerza! Sigan con su increíble labor."
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-foundation-blue focus:ring-foundation-blue sm:text-sm"
+                    />
+                  </div>
+                </div>
 
                 {/* Selector de Monto */}
                 <div className="flex justify-center flex-wrap gap-3 mb-4">
                   {predefinedAmounts.map(val => (
-                    <button
-                      key={val}
-                      onClick={() => setAmount(val)}
-                      className={`px-5 py-2 rounded-full font-semibold transition-all duration-300 border-2 ${amount === val ? 'bg-foundation-blue text-white border-foundation-blue scale-110' : 'bg-transparent text-gray-700 border-gray-300 hover:bg-gray-100'}`}
-                    >
+                    <button key={val} onClick={() => setAmount(val)} className={`px-5 py-2 rounded-full font-semibold transition-all duration-300 border-2 ${amount === val ? 'bg-foundation-blue text-white border-foundation-blue scale-110' : 'bg-transparent text-gray-700 border-gray-300 hover:bg-gray-100'}`}>
                       ${val}
                     </button>
                   ))}
                 </div>
-
+                
                 {/* Campo para Monto Personalizado */}
                 <div className="relative mb-8 mt-4">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">$</span>
-                  <input
-                    type="number"
-                    value={amount}
-                    onChange={handleAmountChange}
-                    placeholder="Otro monto"
-                    className="w-full pl-7 pr-4 py-3 rounded-lg border-2 border-gray-300 focus:ring-2 focus:ring-foundation-blue focus:border-foundation-blue transition"
-                  />
+                  <input type="number" value={amount} onChange={handleAmountChange} placeholder="Otro monto" className="w-full pl-7 pr-4 py-3 rounded-lg border-2 border-gray-300 focus:ring-2 focus:ring-foundation-blue focus:border-foundation-blue transition" />
                 </div>
 
                 {/* Contenedor del Botón de PayPal */}
@@ -111,7 +142,13 @@ const DonationModal = ({ isOpen, onClose }) => {
                       <PayPalButton
                         currency="USD"
                         amount={parseFloat(amount).toFixed(2)}
-                        onSuccess={handleSuccess} // Le pasamos la función para manejar el éxito
+                        onSuccess={handleSuccess}
+                        // Pasamos los datos del donante al botón
+                        donationData={{
+                          name: isAnonymous ? 'Anónimo' : donorName.trim() || 'Anónimo',
+                          message: message.trim(),
+                          amount: parseFloat(amount).toFixed(2),
+                        }}
                       />
                     </>
                   ) : (

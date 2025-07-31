@@ -5,10 +5,15 @@ import { Routes, Route } from 'react-router-dom';
 // Importa los componentes principales y las páginas
 import Navbar from './components/Navbar.jsx';
 import Footer from './components/Footer.jsx';
-import DonationModal from './components/DonationModal.jsx'; // ¡Necesitamos renderizarlo!
+import DonationModal from './components/DonationModal.jsx'; 
 import HomePage from './pages/HomePage.jsx';
 import NewsPage from './pages/NewsPage.jsx';
 import SingleNewsPage from './pages/SingleNewsPage.jsx';
+import AdminLogin from './pages/AdminLogin.jsx';
+import AdminDashboard from './pages/AdminDashboard.jsx';   
+import ProtectedRoute from './components/ProtectedRoute.jsx';
+import GalleryPage from './pages/GalleryPage.jsx';           
+import AlbumDetailPage from './pages/AlbumDetailPage.jsx';
 
 function App() {
   // 1. El estado y las funciones para el modal viven aquí, en el componente padre. ¡Esto está perfecto!
@@ -28,10 +33,21 @@ function App() {
         <Routes>
           {/* 3. Le pasamos la función 'openModal' al elemento HomePage. */}
           <Route path="/" element={<HomePage onDonateClick={openModal} />} />
+          <Route path="/admin" element={<AdminLogin />} />
+          <Route 
+            path="/admin/dashboard" 
+            element={
+              <ProtectedRoute>
+                <AdminDashboard />
+              </ProtectedRoute>
+            }
+            />
           
           {/* Las otras páginas no necesitan la función, pero podrían recibirla si tuvieran un botón de donar. */}
           <Route path="/noticias" element={<NewsPage />} />
           <Route path="/noticias/:articleId" element={<SingleNewsPage />} />
+          <Route path="/galeria" element={<GalleryPage />} />
+          <Route path="/galeria/:albumId" element={<AlbumDetailPage />} />
         </Routes>
       </main>
 

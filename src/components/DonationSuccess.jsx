@@ -7,16 +7,16 @@ const DonationSuccess = ({ onClose }) => {
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 
   useEffect(() => {
-    // Obtenemos el tamaño de la ventana para que el confeti ocupe todo
+    
     const { innerWidth: width, innerHeight: height } = window;
     setDimensions({ width, height });
 
-    // 1. Después de 7 segundos, cerramos todo automáticamente
+   
     const timer = setTimeout(() => {
       onClose();
-    }, 7000); // 7 segundos para disfrutar la celebración
+    }, 8000); 
 
-    // 2. Limpiamos el temporizador si el componente se desmonta antes
+    
     return () => clearTimeout(timer);
   }, [onClose]);
 
@@ -25,8 +25,8 @@ const DonationSuccess = ({ onClose }) => {
       <Confetti
         width={dimensions.width}
         height={dimensions.height}
-        recycle={false} // El confeti cae una vez y desaparece
-        numberOfPieces={400} // Más piezas para una buena explosión
+        recycle={false} 
+        numberOfPieces={400} 
         gravity={0.15}
       />
       <motion.div

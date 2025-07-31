@@ -57,7 +57,9 @@ import logo from '../assets/logo-principal.png';
           <div className="hidden md:flex items-center space-x-6 text-sm font-medium">
             <Link to="/" className="text-gray-600 hover:text-foundation-blue transition-colors">Inicio</Link>
             <a href="/#about" className="text-gray-600 hover:text-foundation-blue transition-colors">Quiénes Somos</a>
-            <a href="/#gallery" className="text-gray-600 hover:text-foundation-blue transition-colors">Galería</a>
+            <NavLink to="/galeria" className={({ isActive }) => `transition-colors ${isActive ? 'text-foundation-blue font-bold' : 'text-gray-600 hover:text-foundation-blue'}`}>
+             Galeria
+            </NavLink>
             <NavLink to="/noticias" className={({ isActive }) => `transition-colors ${isActive ? 'text-foundation-blue font-bold' : 'text-gray-600 hover:text-foundation-blue'}`}>
               Noticias
             </NavLink>
@@ -100,7 +102,7 @@ import logo from '../assets/logo-principal.png';
             <div className="flex flex-col items-center py-4">
               <Link to="/" className="block w-full text-center py-3 text-gray-700 hover:bg-foundation-blue/10" onClick={toggleMenu}>Inicio</Link>
               <a href="/#about" className="block w-full text-center py-3 text-gray-700 hover:bg-foundation-blue/10" onClick={toggleMenu}>Quiénes Somos</a>
-              <a href="/#gallery" className="block w-full text-center py-3 text-gray-700 hover:bg-foundation-blue/10" onClick={toggleMenu}>Galería</a>
+              <a href="/galeria" className="block w-full text-center py-3 text-gray-700 hover:bg-foundation-blue/10" onClick={toggleMenu}>Galería</a>
               <NavLink to="/noticias" className="block w-full text-center py-3 text-gray-700 hover:bg-foundation-blue/10" onClick={toggleMenu}>Noticias</NavLink>
               
               {/* 3. BOTÓN DE DONAR PARA MÓVIL */}

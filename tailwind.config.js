@@ -2,7 +2,7 @@
 export default {
   content: [
     "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}", // <-- ¡ASEGÚRATE DE QUE ESTA LÍNEA ESTÉ ASÍ!
+    "./src/**/*.{js,ts,jsx,tsx}", 
   ],
   theme: {
     extend: {
@@ -19,5 +19,7 @@ export default {
       }
     },
   },
-  plugins: [],
+  plugins: [
+     require('@tailwindcss/aspect-ratio'),
+  ],
 }
